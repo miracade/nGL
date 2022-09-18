@@ -14,6 +14,7 @@ def color2ngl(r, g, b, _=0):
 def tex2ngl(src):
     """Converts src to C header containing nGL TEXTURE. Returns tuple(code, object name, tuple(w, h))."""
     img = Image.open(src)
+    img = img.convert('RGB')
     width, height = img.size
     name = ngl_name(os.path.splitext(os.path.basename(src))[0])
 
