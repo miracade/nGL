@@ -7,6 +7,7 @@ struct IndexedVertex {
     unsigned int index;
     GLFix u, v;
     COLOR c;
+    IndexedVertex(unsigned int index, GLFix u, GLFix v, COLOR c) : index{index}, u{u}, v{v}, c{c} {}
 };
 
 struct ProcessedPosition {
