@@ -42,6 +42,26 @@ struct VECTOR3
 
     void print() const { printf("(%d %d %d)\n", x.toInteger<int>(), y.toInteger<int>(), z.toInteger<int>()); }
 
+    friend bool operator==(const VECTOR3& a, const VECTOR3& b)
+        { return a.x == b.x && a.y == b.y && a.z == b.z; }
+    friend bool operator!=(const VECTOR3& a, const VECTOR3& b)
+        { return !(a == b); }
+    friend bool operator<(const VECTOR3& a, const VECTOR3& b)
+        { return a.x < b.x || (a.x == b.x && (a.y < b.y || (a.y == b.y && a.z < b.z))); }
+
+    friend VECTOR3 operator+(const VECTOR3& a, const VECTOR3& b)
+        { return VECTOR3(a.x + b.x, a.y + b.y, a.z + b.z); }
+    friend VECTOR3 operator-(const VECTOR3& a, const VECTOR3& b)
+        { return VECTOR3(a.x - b.x, a.y - b.y, a.z - b.z); }
+    friend VECTOR3 operator*(const VECTOR3& a, const VECTOR3& b)
+        { return VECTOR3(a.x * b.x, a.y * b.y, a.z * b.z); }
+    friend VECTOR3 operator/(const VECTOR3& a, const VECTOR3& b)
+        { return VECTOR3(a.x / b.x, a.y / b.y, a.z / b.z); }
+    friend VECTOR3 operator*(const VECTOR3& a, const GLFix& b)
+        { return VECTOR3(a.x * b, a.y * b, a.z * b); }
+    friend VECTOR3 operator/(const VECTOR3& a, const GLFix& b)
+        { return VECTOR3(a.x / b, a.y / b, a.z / b); }
+
     GLFix x, y, z;
 };
 
@@ -145,5 +165,7 @@ void glVertex3f(const GLFix x, const GLFix y, const GLFix z);
 void glScale3f(const GLFix x, const GLFix y, const GLFix z);
 void glPushMatrix();
 void glPopMatrix();
+
+uint16_t* glGetZBuffer();
 
 #endif

@@ -919,3 +919,8 @@ void glPushMatrix()
     ++transformation;
     *transformation = *(transformation - 1);
 }
+
+uint16_t* glGetZBuffer() 
+{
+    return z_buffer;
+}
