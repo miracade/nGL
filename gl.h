@@ -168,4 +168,10 @@ void glPopMatrix();
 
 uint16_t* glGetZBuffer();
 
+unsigned int glGetDrawWidth();
+unsigned int glGetDrawHeight();
+
+void glSetDrawWidth(const unsigned int width);
+void glSetDrawHeight(const unsigned int height);
+
 #endif

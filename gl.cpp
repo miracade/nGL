@@ -29,6 +29,10 @@ static VERTEX vertices[4];
 static GLDrawMode draw_mode = GL_TRIANGLES;
 static bool is_monochrome;
 static COLOR *screen_inverted; //For monochrome calcs
+
+static unsigned int draw_width = SCREEN_WIDTH;
+static unsigned int draw_height = SCREEN_HEIGHT;
+
 #ifdef FPS_COUNTER
     volatile unsigned int fps;
 #endif
@@ -153,10 +157,10 @@ void nglPerspective(VERTEX *v)
 #endif
 
     // (0/0) is in the center of the screen
-    v->x += SCREEN_WIDTH/2;
-    v->y += SCREEN_HEIGHT/2;
+    v->x += draw_width/2;
+    v->y += draw_height/2;
 
-    v->y = GLFix(SCREEN_HEIGHT - 1) - v->y;
+    v->y = GLFix(draw_height - 1) - v->y;
 
     //TODO: Move this somewhere else
     if(!texture)
@@ -206,10 +210,10 @@ void nglPerspective(VECTOR3 *v)
 #endif
 
     // (0/0) is in the center of the screen
-    v->x += SCREEN_WIDTH/2;
-    v->y += SCREEN_HEIGHT/2;
+    v->x += draw_width/2;
+    v->y += draw_height/2;
 
-    v->y = GLFix(SCREEN_HEIGHT - 1) - v->y;
+    v->y = GLFix(draw_height - 1) - v->y;
 }
 
 void nglSetBuffer(COLOR *screenBuf)
@@ -223,7 +227,7 @@ void nglDisplay()
         if(is_monochrome)
         {
             //Flip everything, as 0xFFFF is white on CX, but black on classic
-            COLOR *ptr = screen + SCREEN_HEIGHT*SCREEN_WIDTH, *ptr_inv = screen_inverted + SCREEN_HEIGHT*SCREEN_WIDTH;
+            COLOR *ptr = screen + draw_height*draw_width, *ptr_inv = screen_inverted + draw_height*draw_width;
             while(--ptr >= screen)
                 *--ptr_inv = ~*ptr;
 
@@ -304,10 +308,10 @@ void nglRotateZ(const GLFix a)
 
 inline void pixel(const int x, const int y, const GLFix z, const COLOR c)
 {
-    if(x < 0 || y < 0 || x >= SCREEN_WIDTH || y >= SCREEN_HEIGHT)
+    if(x < 0 || y < 0 || x >= draw_width || y >= draw_height)
         return;
 
-    const int pitch = x + y*SCREEN_WIDTH;
+    const int pitch = x + y*draw_width;
 
     if(z <= GLFix(CLIP_PLANE) || GLFix(z_buffer[pitch]) <= z)
         return;
@@ -342,10 +346,10 @@ COLOR colorRGB(const GLFix r, const GLFix g, const GLFix b)
 
 GLFix nglZBufferAt(const unsigned int x, const unsigned int y)
 {
-    if(x >= SCREEN_WIDTH || y >= SCREEN_HEIGHT)
+    if(x >= draw_width || y >= draw_height)
         return 0;
 
-    return z_buffer[x + y * SCREEN_WIDTH];
+    return z_buffer[x + y * draw_width];
 }
 
 //Doesn't interpolate colors even if enabled
@@ -375,8 +379,8 @@ void nglDrawLine3D(const VERTEX *v1, const VERTEX *v2)
 
         int end_y = v2_p.y;
 
-        if(end_y >= SCREEN_HEIGHT)
-            end_y = SCREEN_HEIGHT - 1;
+        if(end_y >= draw_height)
+            end_y = draw_height - 1;
 
         for(; v1_p.y <= GLFix(end_y); ++v1_p.y)
         {
@@ -395,8 +399,8 @@ void nglDrawLine3D(const VERTEX *v1, const VERTEX *v2)
 
         int end_x = v2_p.x;
 
-        if(end_x >= SCREEN_WIDTH)
-            end_x = SCREEN_WIDTH - 1;
+        if(end_x >= draw_width)
+            end_x = draw_width - 1;
 
         for(; v1_p.x <= GLFix(end_x); ++v1_p.x)
         {
@@ -497,7 +501,7 @@ void nglDrawTriangleXRightZClipped(const VERTEX *low, const VERTEX *middle, cons
 static void interpolateVertexXRight(const VERTEX *from, const VERTEX *to, VERTEX *res)
 {
     GLFix diff = to->x - from->x;
-    GLFix end = (SCREEN_WIDTH - 1);
+    GLFix end = (draw_width - 1);
     GLFix t = (end - from->x) / diff;
 
     res->x = end;
@@ -526,26 +530,26 @@ void nglDrawTriangleZClipped(const VERTEX *low, const VERTEX *middle, const VERT
 {
     //If not on screen, skip
     if((low->x < GLFix(0) && middle->x < GLFix(0) && high->x < GLFix(0))
-       || (low->x >= GLFix(SCREEN_WIDTH) && middle->x >= GLFix(SCREEN_WIDTH) && high->x >= GLFix(SCREEN_WIDTH))
+       || (low->x >= GLFix(draw_width) && middle->x >= GLFix(draw_width) && high->x >= GLFix(draw_width))
        || (low->y < GLFix(0) && middle->y < GLFix(0) && high->y < GLFix(0))
-       || (low->y >= GLFix(SCREEN_HEIGHT) && middle->y >= GLFix(SCREEN_HEIGHT) && high->y >= GLFix(SCREEN_HEIGHT)))
+       || (low->y >= GLFix(draw_height) && middle->y >= GLFix(draw_height) && high->y >= GLFix(draw_height)))
         return;
 
     const VERTEX* invisible[3];
     const VERTEX* visible[3];
     int count_invisible = -1, count_visible = -1;
 
-    if(low->x > GLFix(SCREEN_WIDTH-1))
+    if(low->x > GLFix(draw_width-1))
         invisible[++count_invisible] = low;
     else
         visible[++count_visible] = low;
 
-    if(middle->x > GLFix(SCREEN_WIDTH-1))
+    if(middle->x > GLFix(draw_width-1))
         invisible[++count_invisible] = middle;
     else
         visible[++count_visible] = middle;
 
-    if(high->x > GLFix(SCREEN_WIDTH-1))
+    if(high->x > GLFix(draw_width-1))
         invisible[++count_invisible] = high;
     else
         visible[++count_visible] = high;
@@ -859,10 +863,10 @@ void glBegin(GLDrawMode mode)
 void glClear(const int buffers)
 {
     if(buffers & GL_COLOR_BUFFER_BIT)
-        std::fill(screen, screen + SCREEN_WIDTH*SCREEN_HEIGHT, color);
+        std::fill(screen, screen + draw_width*draw_height, color);
 
     if(buffers & GL_DEPTH_BUFFER_BIT)
-        std::fill(z_buffer, z_buffer + SCREEN_WIDTH*SCREEN_HEIGHT, UINT16_MAX);
+        std::fill(z_buffer, z_buffer + draw_width*draw_height, UINT16_MAX);
 }
 
 void glLoadIdentity()
@@ -924,3 +928,20 @@ uint16_t* glGetZBuffer()
 {
     return z_buffer;
 }
+
+unsigned int glGetDrawWidth() { return draw_width; }
+unsigned int glGetDrawHeight() { return draw_height; }
+
+void glSetDrawWidth(unsigned int width)
+{
+    draw_width = std::min<int>(width, SCREEN_WIDTH);
+    near_plane = 256 / (SCREEN_WIDTH / draw_width);
+}
+
+void glSetDrawHeight(unsigned int height)
+{
+    draw_height = std::min<int>(height, SCREEN_HEIGHT);
+    near_plane = 256 / (SCREEN_HEIGHT / draw_height);
+}
+
+

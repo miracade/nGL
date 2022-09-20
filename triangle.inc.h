@@ -1,3 +1,7 @@
+
+extern unsigned int draw_width;
+extern unsigned int draw_height;
+
 //This file will be included in gl.cpp for various different versions
 #ifdef TRANSPARENCY
     static void nglDrawTransparentTriangleXZClipped(const VERTEX *low, const VERTEX *middle, const VERTEX *high)
@@ -19,7 +23,7 @@
     #endif
 #endif
     if((low->y < GLFix(0) && middle->y < GLFix(0) && high->y < GLFix(0))
-        || (low->y >= GLFix(SCREEN_HEIGHT) && middle->y >= GLFix(SCREEN_HEIGHT) && high->y >= GLFix(SCREEN_HEIGHT)))
+        || (low->y >= GLFix(draw_height) && middle->y >= GLFix(draw_height) && high->y >= GLFix(draw_height)))
         return;
 
     if(middle->y > high->y)
@@ -31,7 +35,7 @@
     if(middle->y > high->y)
         std::swap(middle, high);
 
-    if(high->y < GLFix(0) || low->y >= GLFix(SCREEN_HEIGHT))
+    if(high->y < GLFix(0) || low->y >= GLFix(draw_height))
         return;
 
     // The ranges of values from here on allows using some more bits for precision:
@@ -136,10 +140,10 @@
         #endif
     }
 
-    if(high_y >= SCREEN_HEIGHT)
-        high_y = SCREEN_HEIGHT - 1;
+    if(high_y >= draw_height)
+        high_y = draw_height - 1;
 
-    int pitch = y * SCREEN_WIDTH;
+    int pitch = y * draw_width;
     decltype(z_buffer) z_buf_line = z_buffer + pitch;
     decltype(screen) screen_buf_line = screen + pitch;
 
@@ -174,7 +178,7 @@
     if(dx_lower < dx_far)
         goto otherway;
 
-    for(; y <= high_y; y += 1, z_buf_line += SCREEN_WIDTH, screen_buf_line += SCREEN_WIDTH)
+    for(; y <= high_y; y += 1, z_buf_line += draw_width, screen_buf_line += draw_width)
     {
         const int x1 = xstart, x2 = xend;
         const int line_width = x2 - x1;
@@ -276,7 +280,7 @@
     return;
 
     otherway:
-    for(; y <= high_y; y += 1, screen_buf_line += SCREEN_WIDTH, z_buf_line += SCREEN_WIDTH)
+    for(; y <= high_y; y += 1, screen_buf_line += draw_width, z_buf_line += draw_width)
     {
         const int x1 = xend, x2 = xstart;
         const int line_width = x1 - x2;
