@@ -174,4 +174,6 @@ unsigned int glGetDrawHeight();
 void glSetDrawWidth(const unsigned int width);
 void glSetDrawHeight(const unsigned int height);
 
+void glUpscaleFrameBuffer();
+
 #endif

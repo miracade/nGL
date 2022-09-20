@@ -221,6 +221,22 @@ void nglSetBuffer(COLOR *screenBuf)
     screen = screenBuf;
 }
 
+void glUpscaleFrameBuffer()
+{
+    if (draw_width == SCREEN_WIDTH && draw_height == SCREEN_HEIGHT)
+        return;
+
+    for (int y = SCREEN_HEIGHT - 1; y >= 0; --y)
+    {
+        for (int x = SCREEN_WIDTH - 1; x >= 0; --x)
+        {
+            int src_y = y * draw_height / SCREEN_HEIGHT;
+            int src_x = x * draw_width / SCREEN_WIDTH;
+            screen[y*SCREEN_WIDTH + x] = screen[src_y*draw_width + src_x];
+        }
+    }
+}
+
 void nglDisplay()
 {
     #ifdef _TINSPIRE
@@ -935,13 +951,13 @@ unsigned int glGetDrawHeight() { return draw_height; }
 void glSetDrawWidth(unsigned int width)
 {
     draw_width = std::min<int>(width, SCREEN_WIDTH);
-    near_plane = 256 / (SCREEN_WIDTH / draw_width);
+    near_plane = GLFix{256} / SCREEN_WIDTH * draw_width;
 }
 
 void glSetDrawHeight(unsigned int height)
 {
     draw_height = std::min<int>(height, SCREEN_HEIGHT);
-    near_plane = 256 / (SCREEN_HEIGHT / draw_height);
+    near_plane = GLFix{256} / SCREEN_HEIGHT * draw_height;
 }
 
 
