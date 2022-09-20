@@ -171,6 +171,8 @@ uint16_t* glGetZBuffer();
 unsigned int glGetDrawWidth();
 unsigned int glGetDrawHeight();
 
+void glSetDrawResolution(const unsigned int res);
+
 void glSetDrawWidth(const unsigned int width);
 void glSetDrawHeight(const unsigned int height);
 

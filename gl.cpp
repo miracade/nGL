@@ -948,13 +948,19 @@ uint16_t* glGetZBuffer()
 unsigned int glGetDrawWidth() { return draw_width; }
 unsigned int glGetDrawHeight() { return draw_height; }
 
-void glSetDrawWidth(unsigned int width)
+void glSetDrawResolution(const unsigned int res)
+{
+    glSetDrawWidth(res);
+    glSetDrawHeight(res * SCREEN_HEIGHT / SCREEN_WIDTH);
+}
+
+void glSetDrawWidth(const unsigned int width)
 {
     draw_width = std::min<int>(width, SCREEN_WIDTH);
     near_plane = GLFix{256} / SCREEN_WIDTH * draw_width;
 }
 
-void glSetDrawHeight(unsigned int height)
+void glSetDrawHeight(const unsigned int height)
 {
     draw_height = std::min<int>(height, SCREEN_HEIGHT);
     near_plane = GLFix{256} / SCREEN_HEIGHT * draw_height;
