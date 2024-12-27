@@ -64,6 +64,10 @@ public:
     constexpr bool operator ==(const Fix<s,T>& other) const { return value == other.value; }
     constexpr bool operator !=(const Fix<s,T>& other) const { return value != other.value; }
 
+    constexpr Fix<s, T> abs() const {
+        return (value < 0) ? -(*this) : *this;
+    }
+
     template <typename U>
     constexpr U toInteger() const
     {
