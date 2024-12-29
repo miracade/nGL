@@ -7,11 +7,11 @@
 
 #define LUT_SIZE ((FFix(360+90).value)+1)
 
-static FFix *table_sin;
+static FFix table_sin[LUT_SIZE];
 
 void init_fastmath()
 {	
-    table_sin = new FFix[LUT_SIZE];
+    // table_sin = new FFix[LUT_SIZE];
 
     float incr = (1.0 / (1<<FFix::precision)) * (pi/180);
 
@@ -27,7 +27,7 @@ void init_fastmath()
 
 void uninit_fastmath()
 {
-    delete[] table_sin;
+    // delete[] table_sin;
 }
 
 FFix fast_sin(FFix deg)
